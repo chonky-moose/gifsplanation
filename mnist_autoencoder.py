@@ -191,5 +191,5 @@ if __name__ == '__main__':
         plot_ae_outputs(ae,n=10)
 # %%
 # Save model
-savepath = r'./mnist_ae_z2.pt'
-torch.save(ae.state_dict(), savepath)
+# savepath = r'./mnist_ae_z2.pt'
+# torch.save(ae.state_dict(), savepath)
