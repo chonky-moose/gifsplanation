@@ -56,3 +56,5 @@ plt.plot(x.detach(), y.detach())
 
 #%%
 plt.plot(x.detach(), x.grad.detach())
+
+#%%
