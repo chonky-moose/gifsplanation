@@ -145,6 +145,7 @@ def test_epoch(epoch, ae, device, dataloader, loss_fn):
     return val_loss.data
 
 def plot_ae_outputs(ae, n=10):
+    ae.to(device)
     plt.figure(figsize=(16, 4.5))
     targets = test_dataset.targets.numpy()
     t_idx = {i : np.where(targets==i)[0][0] for i in range(n)}
