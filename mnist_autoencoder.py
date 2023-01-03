@@ -14,7 +14,7 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as T
 # %%
-data_dir = r'../DATASETS/mnist'
+data_dir = r'../DATASETS/'
 tf = T.Compose([
     T.ToTensor(),
     T.Normalize((0.1307,), (0.3081,))
@@ -88,10 +88,10 @@ class Decoder(nn.Module):
 # ie have encode, decode as methods and
 # and return a dictionary of latent variable 'z' and decoded output 'out'
 class Autoencoder(nn.Module):
-    def __init__(self, encoder, decoder, latent_space_dim):
+    def __init__(self, latent_space_dim):
         super().__init__()
-        self.encoder = encoder(latent_space_dim)
-        self.decoder = decoder(latent_space_dim)
+        self.encoder = Encoder(latent_space_dim)
+        self.decoder = Decoder(latent_space_dim)
         
     def encode(self, x):
         z = self.encoder(x)
@@ -108,8 +108,6 @@ class Autoencoder(nn.Module):
         return ret
 # %%
 # Train an instance of the Autoencoder class
-
-
 def train_epoch(epoch, ae, device, dataloader, loss_fn, optimizer):
     ae.train()
     train_loss = []
@@ -179,7 +177,7 @@ if __name__ == '__main__':
     loss_fn = torch.nn.MSELoss()
     lr = 0.001
     d = 2 # latent space dimensions
-    ae = Autoencoder(Encoder, Decoder, d).to(device)
+    ae = Autoencoder(d).to(device)
     optim = torch.optim.Adam(ae.parameters(), lr=lr)
     
     num_epochs = 20

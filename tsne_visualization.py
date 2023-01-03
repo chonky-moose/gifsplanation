@@ -142,3 +142,6 @@ df2['dot_size']  = [50 if x=='Shifted' else 10 for x in df2['label']]
 # Visualize
 px.scatter(df2, x='encoded variable 0', y='encoded variable 1',
            color=df2.label.astype(str), size='dot_size', opacity=0.5)
+
+# %%
+# Visualization of latent space but using VAE instead of vanilla AE
