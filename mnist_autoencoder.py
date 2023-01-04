@@ -13,16 +13,16 @@ import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as T
-# %%
+
 data_dir = r'../DATASETS/'
 tf = T.Compose([
     T.ToTensor(),
     T.Normalize((0.1307,), (0.3081,))
 ])
 train_dataset = torchvision.datasets.MNIST(data_dir, train=True,
-                                           download=True, transform=tf)
+                                        download=True, transform=tf)
 test_dataset = torchvision.datasets.MNIST(data_dir, train=False,
-                                          download=True, transform=tf)
+                                        download=True, transform=tf)
 
 batch_size = 128
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size)
@@ -172,8 +172,8 @@ def plot_ae_outputs(ae, n=10):
     plt.show()
 
 # %%
-if __name__ == '__main__':
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+if __name__ == '__main__':    
+
     loss_fn = torch.nn.MSELoss()
     lr = 0.001
     d = 2 # latent space dimensions

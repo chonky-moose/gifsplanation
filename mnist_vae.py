@@ -11,21 +11,20 @@ import torchvision.transforms as T
 
 from mnist_autoencoder import Autoencoder
 
-# %%
 data_dir = r'../DATASETS/'
 tf = T.Compose([
     T.ToTensor(),
     T.Normalize((0.1307,), (0.3081,))
 ])
 train_dataset = torchvision.datasets.MNIST(data_dir, train=True,
-                                           download=True, transform=tf)
+                                        download=True, transform=tf)
 test_dataset = torchvision.datasets.MNIST(data_dir, train=False,
-                                          download=True, transform=tf)
-
+                                        download=True, transform=tf)
 batch_size = 128
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size)
 test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 # %%
 class VariationalEncoder(nn.Module):
     def __init__(self, latent_dims):
@@ -113,27 +112,6 @@ class VariationalAutoencoder(nn.Module):
         ret["out"] = self.decoder(z)
         return ret
 
-#%%
-ae = Autoencoder(2).to(device)
-vae = VariationalAutoencoder(latent_dims=2).to(device)
-image_batch, _ = next(iter(train_loader))
-image_batch = image_batch[:4].to(device)
-print(image_batch.shape)
-
-#%%
-vae_z = vae.encode(image_batch)
-ae_z = ae.encode(image_batch)
-
-vae_decoded = vae.decode(vae_z)
-ae_decoded = ae.decode(ae_z)
-print(vae_decoded.shape, ae_decoded.shape)
-
-fig, ax = plt.subplots(2, 4, figsize=(10,6))
-for i, img in enumerate(vae_decoded):
-    ax[0, i].imshow(vae_decoded[i][0].detach().cpu().numpy())
-for i, img in enumerate(ae_decoded):
-    ax[1, i].imshow(ae_decoded[i][0].detach().cpu().numpy())
-
 
 # %%
 def vae_train_epoch(epoch, vae, device, dataloader, loss_fn, optimizer):
@@ -200,9 +178,8 @@ def plot_vae_outputs(vae, n=10):
             ax.set_title("Reconstructed images")
     plt.show()
 # %%
-if __name__ == '__main__':
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    loss_fn = torch.nn.MSELoss()
+if __name__ == '__main__':    
+    # loss_fn = torch.nn.MSELoss()
     lr = 0.001
     d = 2 # latent space dimensions
     vae = VariationalAutoencoder(d).to(device)
@@ -211,7 +188,11 @@ if __name__ == '__main__':
     num_epochs = 15
     losses = {'train loss':[], 'val loss':[]}
     for epoch in range(1, num_epochs+1):
-        train_loss = vae_train_epoch(epoch, vae, device, train_loader, loss_fn, optim)
+        train_loss = vae_train_epoch(epoch, vae, device, train_loader,
+                                     loss_fn=None, optimizer=optim)
         losses['train loss'].append(train_loss)
         plot_vae_outputs(vae, n=10)
 # %%
+# Save VAE
+# savepath = r'./mnist_vae_z2.pt'
+# torch.save(vae.state_dict(), savepath)

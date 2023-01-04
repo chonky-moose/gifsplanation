@@ -8,17 +8,16 @@ import torch
 import torch.nn as nn
 import torchvision
 import torchvision.transforms as T
-# %%
+
 tf = T.Compose([
     T.ToTensor(),
     T.Normalize((0.1307,), (0.3081,))
 ])
 trainset = torchvision.datasets.MNIST(r'../DATASETS/mnist', train=True,
-                                      download=True, transform=tf)
+                                    download=True, transform=tf)
 valset = torchvision.datasets.MNIST(r'../DATASETS/mnist', train=False,
                                     download=True, transform=tf)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 # %%
 class Mnist_CNN(nn.Module):
     def __init__(self, input_size, num_classes):
@@ -45,9 +44,10 @@ class Mnist_CNN(nn.Module):
 
 #%%
 def main():
+
+    
     model = Mnist_CNN((1,28,28), 10)
     
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     lr = 1e-3
     epochs = 50
     batch_size = 64
