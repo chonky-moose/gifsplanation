@@ -48,7 +48,7 @@ px.scatter(z_df, x='z0', y='z1', color=z_df.label.astype(str))
 n_iters = 10
 step_size = 0.5
 
-starting_digit, target_class = 1, 9
+starting_digit, target_class = 1, 0
 labels = train_dataset.targets.numpy()
 labels_idx = {i : np.where(labels==i)[0][0] for i in range(10)}
 x, _ = train_dataset[labels_idx[starting_digit]]

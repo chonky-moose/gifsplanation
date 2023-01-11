@@ -17,24 +17,24 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # %%
 tf = T.Compose([
     T.Grayscale(),
-    T.Resize((64, 64)),
+    T.Resize((224, 224)),
     T.ToTensor(),
     # T.Normalize((0.4823,),(0.2363,))
 ])
 train_path = r'C:\Users\lab402\Projects\DATASETS\ucsd_cxr\chest_xray\train'
 train_dataset = ImageFolder(train_path, transform=tf)
-train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
 
 test_path = r'C:\Users\lab402\Projects\DATASETS\ucsd_cxr\chest_xray\test'
 test_dataset = ImageFolder(test_path, transform=tf)
-test_loader = DataLoader(test_dataset, batch_size=16, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=8, shuffle=True)
 
 
 # %%
 images, labels = next(iter(train_loader))
 print(images.shape, labels)
 #%%
-vqvae = VQVAE(in_channels=1, embedding_dim=500, num_embeddings=500)
+vqvae = VQVAE(in_channels=1, embedding_dim=5000, num_embeddings=5000)
 vqvae = vqvae.to(device)
 recon_images, input_images, vq_loss = vqvae(images.to(device))
 #%%
@@ -88,44 +88,22 @@ def plot_vae_outputs(vae, dataset, n=2):
 if __name__ == '__main__':    
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     lr = 3e-4
-    dimensions = [5000, 10000, 50000, 100000]
+    dimensions = [5000]
     for dimension in dimensions:
         vqvae = VQVAE(in_channels=1, embedding_dim=dimension, num_embeddings=dimension).to(device)
         optim = torch.optim.Adam(vqvae.parameters(), lr=lr)
         
-        num_epochs = 30
+        num_epochs = 20
         current_best_loss = 99999
         losses = {'train loss':[], 'val loss':[]}
         for epoch in range(1, num_epochs+1):
             train_loss = vae_train_epoch(epoch, vqvae, device, train_loader, optim)
             losses['train loss'].append(train_loss)
             if train_loss <= current_best_loss:
-                savepath = f'./vqvae_dim_{str(dimension)}_epoch{epoch}.pt'
+                savepath = f'./vqvae_dim_px224_{str(dimension)}_epoch{epoch}.pt'
                 torch.save(vqvae.state_dict(), savepath)
                 current_best_loss = train_loss
             plot_vae_outputs(vqvae, test_dataset, n=2)
             
-#%%
-# Load trained VQ-VAE model and encode an image
-m = VQVAE(in_channels=1, embedding_dim=10000, num_embeddings=10000).to(device)
-m.load_state_dict(torch.load(r'./vqvae_results/vqvae_dim_10000_epoch30.pt'))
-# %%
-train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
-images, labels = next(iter(train_loader))
-print(images.shape, labels)
-# %%
-z = m.encode(images.to(device))
-# %%
-z[0].shape
 
-#%%
-xhat = m.decode(z[0])
-# %%
-fig, ax = plt.subplots(2, 4, figsize=(8, 4))
-for i, img in enumerate(xhat):
-    ax[i//4, i%4].imshow(img[0].detach().cpu().numpy(), cmap='gray')
-# %%
-fig, ax = plt.subplots(2, 4, figsize=(8, 4))
-for i, img in enumerate(images):
-    ax[i//4, i%4].imshow(img[0].detach().cpu().numpy(), cmap='gray')
 # %%
